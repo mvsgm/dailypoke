@@ -88,12 +88,10 @@ dados ou editar o armazenamento pode mudar o histórico. O modo livre permanece
 disponível mesmo quando o navegador bloqueia o armazenamento. Esta primeira
 versão não inclui salvamento de uma batalha em andamento.
 
-## Origem e créditos
+## Créditos
 
-A ideia de um desafio diário foi inspirada no
-[DailyRed](https://github.com/amoi-builds/dailyred), de amoi-builds. A interface,
-o adaptador e o controle diário deste projeto foram desenvolvidos separadamente;
-não foram copiados os patches, scripts ou código do DailyRed.
+O DailyPoke é um projeto pessoal de Marcos Guerra. A interface, o adaptador
+e o controle diário foram desenvolvidos para este projeto.
 
 - Motor: [Pokémon Showdown / pkmn](https://github.com/pkmn/ps), licença MIT;
 - Sprites de geração III: [PokeAPI/sprites](https://github.com/PokeAPI/sprites);

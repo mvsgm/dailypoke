@@ -60,25 +60,6 @@ const RED = [
   ['Blastoise', 'Torrent', 'Modest', ['Surf', 'Ice Beam', 'Toxic', 'Protect'], 'Leftovers'],
 ];
 
-const MOVE_NAMES = {
-  aerialace: 'Ás dos Ares', bite: 'Mordida', bodyslam: 'Golpe Corporal',
-  brickbreak: 'Quebra-Telha', bulkup: 'Corpanzil', calmmind: 'Mente Calma',
-  confuseray: 'Raio Confusão', crosschop: 'Corte Cruzado', crunch: 'Trituração',
-  doubleedge: 'Gume Duplo', dragonbreath: 'Sopro do Dragão', dragonclaw: 'Garra do Dragão',
-  dragondance: 'Dança do Dragão', earthquake: 'Terremoto', extremespeed: 'Velocidade Extrema',
-  firepunch: 'Soco de Fogo', flamethrower: 'Lança-Chamas', gigadrain: 'Giga Dreno',
-  hypnosis: 'Hipnose', icebeam: 'Raio de Gelo', icepunch: 'Soco de Gelo',
-  irontail: 'Cauda de Ferro', leafblade: 'Lâmina de Folha', leechseed: 'Semente Sanguessuga',
-  lightscreen: 'Tela de Luz', megahorn: 'Megachifre', meteormash: 'Soco Meteoro',
-  moonlight: 'Luar', morningsun: 'Sol da Manhã', protect: 'Proteção', psychic: 'Psíquico',
-  quickattack: 'Ataque Rápido', recover: 'Recuperação', reflect: 'Reflexo', rest: 'Descanso',
-  return: 'Retorno', rockslide: 'Deslize de Pedras', shadowball: 'Bola Sombria',
-  skyuppercut: 'Gancho Celeste', sleeppowder: 'Pó do Sono', sleeptalk: 'Sonâmbulo',
-  sludgebomb: 'Bomba de Lodo', solarbeam: 'Raio Solar', steelwing: 'Asa de Aço',
-  struggle: 'Luta', sunnyday: 'Dia Ensolarado', surf: 'Surfar', swordsdance: 'Dança das Espadas',
-  thunderbolt: 'Choque do Trovão', thunderpunch: 'Soco do Trovão', thunderwave: 'Onda de Trovão',
-  toxic: 'Tóxico',
-};
 
 function hash(value) {
   let result = 2166136261;
@@ -121,7 +102,7 @@ export function generateTeam(seed) {
 function moveInfo(id, extra = {}) {
   const move = dex.moves.get(id);
   return {
-    id: move.id, name: MOVE_NAMES[move.id] || move.name,
+    id: move.id, name: move.name,
     officialName: move.name, type: move.type, category: move.category,
     ...extra,
   };
@@ -216,7 +197,7 @@ function eventToText(line, names) {
   case 'faint': return `${name} desmaiou!`;
   case '-boost': return `${STAT_NAMES[value] || value} de ${name} aumentou${Number(extra) > 1 ? ' muito' : ''}.`;
   case '-unboost': return `${STAT_NAMES[value] || value} de ${name} diminuiu${Number(extra) > 1 ? ' muito' : ''}.`;
-  case '-start': return `${name}: ${value === 'confusion' ? 'ficou confuso' : value === 'move: Leech Seed' ? 'foi atingido por Semente Sanguessuga' : value}.`;
+  case '-start': return `${name}: ${value === 'confusion' ? 'ficou confuso' : value === 'move: Leech Seed' ? 'foi atingido por Leech Seed' : value}.`;
   case '-end': return value === 'confusion' ? `${name} deixou de ficar confuso.` : '';
   case '-fail': return 'O movimento falhou.';
   case '-activate': return `${name}: ${value}.`;
