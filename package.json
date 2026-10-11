@@ -1,0 +1,13 @@
+{
+  "name": "dailypoke",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Batalhas Pokémon em português com desafio diário e modo livre.",
+  "scripts": {
+    "build": "esbuild src/engine.js --bundle --minify --format=esm --platform=browser --outfile=dist/engine.js",
+    "test": "node --test tests/*.test.mjs"
+  },
+  "dependencies": {"@pkmn/sim": "0.10.11"},
+  "devDependencies": {"esbuild": "0.25.10", "linkedom": "0.18.12"}
+}

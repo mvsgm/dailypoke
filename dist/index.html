@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f6f4ed">
+  <meta name="description" content="Seis Pokémon. Um desafio novo todos os dias. Jogue a DailyPoke ou treine sem limites no modo livre.">
+  <title>DailyPoke — Seu time. Seu desafio.</title>
+  <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <header class="site-header"><a class="brand" href="./" aria-label="DailyPoke, início"><span class="brand-mark" aria-hidden="true"></span><span>DAILY<span class="brand-small">POKE</span></span></a><nav aria-label="Navegação principal"><button class="nav-item selected" id="play-nav">Arena</button><button class="nav-item" id="history-nav">Meu histórico</button></nav><button class="help-button" id="help" aria-label="Como jogar">?</button></header>
+  <main class="layout">
+    <aside class="sidebar">
+      <div class="trainer"><div class="avatar">G</div><div><span class="eyebrow">TREINADOR</span><strong>Guerra</strong><span class="trainer-caption">A próxima vitória é sua.</span></div></div>
+      <div class="record-heading"><span class="eyebrow">SUA JORNADA DIÁRIA</span><span class="tiny-ball" aria-hidden="true"></span></div>
+      <div class="record-grid"><div><strong id="wins">0</strong><span>vitórias</span></div><div><strong id="streak">0</strong><span>em sequência</span></div><div><strong id="battles">0</strong><span>batalhas</span></div><div><strong id="rate">—</strong><span>aproveitamento</span></div></div>
+      <div class="week-box"><div class="week-title"><span>Últimos 7 dias</span><span id="week-caption">comece hoje</span></div><div class="week" id="week"></div><div class="week-legend"><span><i class="legend win"></i>Vitória</span><span><i class="legend loss"></i>Derrota</span></div></div>
+      <div class="sidebar-note"><span class="note-star">✦</span><p>O mesmo time para todos.<br>Uma nova chance a cada dia.</p></div>
+      <div class="local-note">Seu histórico fica salvo neste navegador.</div>
+    </aside>
+    <section class="main-column" aria-label="Arena Pokémon">
+      <div class="intro"><div><div class="eyebrow accent">DESAFIO POKÉMON · GERAÇÃO III</div><h1>Seu time.<br><span>Seu desafio.</span></h1><p>Seis Pokémon. Um rival à altura.<br>Faça cada escolha valer.</p></div><div class="edition"><span class="edition-dot"></span><span>EDIÇÃO DO DIA<strong id="date-label">—</strong></span></div></div>
+      <div class="arena-heading"><div class="mode-tabs" role="tablist" aria-label="Modo de jogo"><button id="daily-tab" role="tab" aria-selected="true" class="mode-tab active">Desafio diário</button><button id="free-tab" role="tab" aria-selected="false" class="mode-tab">Modo livre <span>∞</span></button></div><span class="mode-label" id="mode-label">UMA TENTATIVA · NÍVEL 100</span></div>
+      <div class="arena" id="arena">
+        <div class="stage" id="stage"><div class="stage-topline"><span class="stage-location">ALTO DA LIGA</span><span class="round-badge" id="turn-badge">SEU RIVAL</span></div><div class="mountain mountain-one"></div><div class="mountain mountain-two"></div><div class="mist"></div><div class="battle-ground opponent-ground"></div><div class="battle-ground player-ground"></div>
+          <div class="combat-card opponent-card" id="opponent-card"><div class="combat-title"><strong id="opponent-name">Pikachu</strong><span>Lv. 100</span></div><div class="hp-line"><span>HP</span><div class="hp-track"><div id="opponent-hp"></div></div></div><div class="combat-meta"><span id="opponent-status"></span><span id="opponent-party">● ● ● ● ● ●</span></div></div>
+          <img class="pokemon-sprite opponent-sprite" id="opponent-sprite" src="./assets/pokemon/25.png" alt="Pikachu, Pokémon do Red" width="96" height="96">
+          <div class="rival-label" id="rival-label"><span>O ÚLTIMO OBSTÁCULO</span><strong>RED</strong></div>
+          <img class="pokemon-sprite player-sprite hidden" id="player-sprite" alt="Seu Pokémon" width="96" height="96">
+          <div class="combat-card player-card hidden" id="player-card"><div class="combat-title"><strong id="player-name"></strong><span>Lv. 100</span></div><div class="hp-line"><span>HP</span><div class="hp-track"><div id="player-hp"></div></div></div><div class="combat-meta"><span id="player-status"></span><span id="player-health"></span></div></div>
+          <div class="stage-caption" id="stage-caption"><span class="challenge-symbol">VS</span><p>Ele trouxe os melhores.<br><strong>Você trouxe estratégia.</strong></p></div>
+        </div>
+        <div class="lobby-panel" id="lobby-panel"><div class="lobby-copy"><span class="eyebrow" id="lobby-tag">O DESAFIO DE HOJE</span><h2 id="lobby-title">Consegue vencer o Red?</h2><p id="lobby-description">Sua equipe já está pronta. Estude os golpes e entre na arena.</p></div><button class="primary-button" id="start-button">Entrar na arena <span aria-hidden="true">↗</span></button></div>
+        <div class="battle-panel hidden" id="battle-panel"><div class="battle-toolbar"><div><span class="eyebrow">SUA VEZ</span><h2 id="action-title">Escolha um golpe</h2></div><button class="text-button" id="quit">Sair da batalha</button></div><div class="moves-grid" id="moves"></div><div class="battle-log" id="battle-log" aria-live="polite" aria-label="Eventos da batalha"></div></div>
+        <div class="result-panel hidden" id="result-panel" aria-live="polite"><div><span class="eyebrow" id="result-tag"></span><h2 id="result-title"></h2><p id="result-description"></p></div><div class="result-actions"><button class="primary-button" id="result-button"></button><button class="secondary-button" id="share">Copiar resultado</button></div></div>
+      </div>
+      <section class="team-section" aria-label="Sua equipe"><div class="section-heading"><div><span class="eyebrow" id="team-eyebrow">EQUIPE DO DIA</span><h2 id="team-title">Conheça seu time</h2></div><button class="text-button hidden" id="reroll">↻ Sortear equipe</button><span class="team-hint" id="team-hint">TOQUE PARA VER OS GOLPES</span></div><div class="team-grid" id="team-grid"></div><p class="team-instruction hidden" id="team-instruction">Selecione outro Pokémon para trocar. A troca usa seu turno.</p></section>
+      <div class="bottom-info"><div><span>01</span><p><strong>Um novo time, todo dia.</strong>O sorteio é igual para todos na mesma data local.</p></div><div><span>02</span><p><strong>Treine do seu jeito.</strong>No modo livre, você pode jogar quantas vezes quiser.</p></div><div><span>03</span><p><strong>Encontre a vantagem.</strong>Tipos, golpes e trocas fazem a diferença.</p></div></div>
+      <div id="feedback" class="feedback hidden" role="status"></div>
+    </section>
+  </main>
+  <footer><span>DAILYPOKE <span class="footer-dot">●</span> FEITO PARA JOGAR.</span><span>Projeto de fã não oficial · <a href="./credits.html">Créditos</a></span></footer>
+  <dialog id="dialog"><div class="dialog-heading"><h2 id="dialog-title"></h2><button id="dialog-close" class="dialog-close" aria-label="Fechar">×</button></div><div id="dialog-content"></div></dialog>
+  <script type="module" src="./app.js"></script>
+</body></html>

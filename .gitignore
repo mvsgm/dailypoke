@@ -1,0 +1,7 @@
+node_modules/
+.DS_Store
+*.log
+.openai/deployment*.json
+
+# Generated battle simulator bundle; rebuilt by GitHub Actions
+dist/engine.js
