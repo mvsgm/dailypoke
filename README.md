@@ -81,6 +81,13 @@ Red usa Pikachu, Espeon, Snorlax, Venusaur, Charizard e Blastoise. A inteligênc
 do adversário avalia dano provável e algumas situações de status/recuperação;
 ela é heurística e não calcula todas as estratégias possíveis.
 
+Os dois lados usam o mesmo nível, os mesmos parâmetros de treino e o mesmo
+item, **Lum Berry**, que cura uma condição de status uma vez. O Red não recebe
+Light Ball, Leftovers ou um multiplicador exclusivo de dano. A diferença de
+dano depende da espécie, do golpe, dos tipos, da natureza, das habilidades e
+das condições da batalha. O registro mostra os PV perdidos em cada evento e,
+separadamente, os PV restantes.
+
 O histórico fica no `localStorage` deste navegador, limitado aos últimos 90
 resultados, com totais acumulados preservados. Não há login, sincronização,
 ranking ou verificação remota da tentativa diária. Trocar navegador, limpar

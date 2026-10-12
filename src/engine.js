@@ -7,6 +7,7 @@ const dex = Dex.forGen(3);
 const VERSION = 'liga-do-dia-v1';
 const BALANCED_EVS = {hp: 84, atk: 84, def: 84, spa: 84, spd: 84, spe: 84};
 const PERFECT_IVS = {hp: 31, atk: 31, def: 31, spa: 31, spd: 31, spe: 31};
+const COMMON_BATTLE_ITEM = 'Lum Berry';
 
 // All species and moves are available by Generation 3. Moves are intentionally
 // curated instead of sampled from the whole learnset to avoid unusable teams.
@@ -52,12 +53,12 @@ const POOL = [
 ];
 
 const RED = [
-  ['Pikachu', 'Static', 'Modest', ['Thunderbolt', 'Surf', 'Thunder Wave', 'Quick Attack'], 'Light Ball'],
-  ['Espeon', 'Synchronize', 'Timid', ['Psychic', 'Bite', 'Morning Sun', 'Reflect'], 'Leftovers'],
-  ['Snorlax', 'Thick Fat', 'Adamant', ['Body Slam', 'Shadow Ball', 'Rest', 'Sleep Talk'], 'Leftovers'],
-  ['Venusaur', 'Overgrow', 'Modest', ['Giga Drain', 'Sludge Bomb', 'Sleep Powder', 'Leech Seed'], 'Leftovers'],
-  ['Charizard', 'Blaze', 'Mild', ['Flamethrower', 'Dragon Claw', 'Earthquake', 'Aerial Ace'], 'Lum Berry'],
-  ['Blastoise', 'Torrent', 'Modest', ['Surf', 'Ice Beam', 'Toxic', 'Protect'], 'Leftovers'],
+  ['Pikachu', 'Static', 'Modest', ['Thunderbolt', 'Surf', 'Thunder Wave', 'Quick Attack']],
+  ['Espeon', 'Synchronize', 'Timid', ['Psychic', 'Bite', 'Morning Sun', 'Reflect']],
+  ['Snorlax', 'Thick Fat', 'Adamant', ['Body Slam', 'Shadow Ball', 'Rest', 'Sleep Talk']],
+  ['Venusaur', 'Overgrow', 'Modest', ['Giga Drain', 'Sludge Bomb', 'Sleep Powder', 'Leech Seed']],
+  ['Charizard', 'Blaze', 'Mild', ['Flamethrower', 'Dragon Claw', 'Earthquake', 'Aerial Ace']],
+  ['Blastoise', 'Torrent', 'Modest', ['Surf', 'Ice Beam', 'Toxic', 'Protect']],
 ];
 
 
@@ -81,9 +82,9 @@ function randomGenerator(seed) {
 }
 
 function setFromEntry(entry) {
-  const [species, ability, nature, moves, item = 'Lum Berry'] = entry;
+  const [species, ability, nature, moves] = entry;
   return {
-    name: species, species, ability, nature, moves: [...moves], item,
+    name: species, species, ability, nature, moves: [...moves], item: COMMON_BATTLE_ITEM,
     level: 100, evs: {...BALANCED_EVS}, ivs: {...PERFECT_IVS},
     gender: species === 'Nidoqueen' ? 'F' : species === 'Nidoking' ? 'M' : undefined,
   };
@@ -97,6 +98,10 @@ export function generateTeam(seed) {
     [entries[i], entries[j]] = [entries[j], entries[i]];
   }
   return entries.slice(0, 6).map(setFromEntry);
+}
+
+export function generateOpponentTeam() {
+  return RED.map(setFromEntry);
 }
 
 function moveInfo(id, extra = {}) {
@@ -178,14 +183,46 @@ const STATUS_NAMES = {brn: 'queimado', par: 'paralisado', slp: 'adormeceu', psn:
 const STAT_NAMES = {atk: 'Ataque', def: 'Defesa', spa: 'Ataque Especial', spd: 'Defesa Especial', spe: 'Velocidade', accuracy: 'Precisão', evasion: 'Evasão'};
 const pokemonName = ident => ident?.includes(': ') ? ident.split(': ').slice(1).join(': ') : ident;
 
-function eventToText(line, names) {
-  const [, event, subject, value, extra] = line.split('|');
+function eventToText(line, names, health) {
+  const parts = line.split('|');
+  const [, event, subject, value, extra] = parts;
   const name = pokemonName(subject);
+  function rememberHp(ident, raw) {
+    const previous = health.get(ident);
+    const match = /^(\d+)(?:\/(\d+))?(?:\s|$)/.exec(raw || '');
+    if (!match) return {previous, current: null};
+    const hp = Number(match[1]);
+    const maxHp = match[2] ? Number(match[2]) : previous?.maxHp;
+    if (!Number.isSafeInteger(hp) || (maxHp !== undefined && (!Number.isSafeInteger(maxHp) || maxHp <= 0 || hp > maxHp))) {
+      return {previous, current: null};
+    }
+    const current = {hp, maxHp};
+    health.set(ident, current);
+    return {previous, current};
+  }
+  function healthChangeText(healing) {
+    const {previous, current} = rememberHp(subject, value);
+    if (!current) return healing ? `${name} recuperou PV.` : `${name} sofreu dano.`;
+    const remaining = `${current.hp}${current.maxHp === undefined ? '' : `/${current.maxHp}`}`;
+    // Protocol HP is health remaining after an event, never the damage amount.
+    // Compare consecutive events for this exact side and Pokémon, so recovery,
+    // switches and repeated hits cannot distort a later damage delta.
+    if (previous && previous.maxHp === current.maxHp) {
+      const amount = healing ? current.hp - previous.hp : previous.hp - current.hp;
+      if (amount >= 0) return `${name} ${healing ? 'recuperou' : 'perdeu'} ${amount} PV (${remaining} restantes).`;
+    }
+    return `${name} ficou com ${remaining} PV.`;
+  }
   switch (event) {
-  case 'switch': case 'drag': return `${subject.startsWith('p1') ? names.player : names.opponent} enviou ${name}.`;
+  case 'switch': case 'drag':
+    rememberHp(subject, extra);
+    return `${subject.startsWith('p1') ? names.player : names.opponent} enviou ${name}.`;
   case 'move': return `${name} usou ${moveInfo(value).name}.`;
-  case '-damage': return `${name} sofreu dano (${value.replace(/ (?:brn|par|slp|psn|tox|frz|fnt)$/, '')} PV).`;
-  case '-heal': return `${name} recuperou PV.`;
+  case '-damage': return healthChangeText(false);
+  case '-heal': return healthChangeText(true);
+  case '-sethp':
+    for (let index = 2; index + 1 < parts.length && !parts[index].startsWith('['); index += 2) rememberHp(parts[index], parts[index + 1]);
+    return '';
   case '-supereffective': return 'Foi supereficaz!';
   case '-resisted': return 'O ataque foi pouco eficaz.';
   case '-immune': return `${name} não foi afetado.`;
@@ -194,7 +231,9 @@ function eventToText(line, names) {
   case '-status': return value === 'slp' ? `${name} adormeceu.` : `${name} ficou ${STATUS_NAMES[value] || value}.`;
   case '-curestatus': return value === 'slp' ? `${name} acordou.` : `${name} se recuperou da condição de status.`;
   case 'cant': return `${name} não conseguiu agir${value === 'slp' ? ': está dormindo' : value === 'par' ? ': paralisia' : value === 'frz' ? ': está congelado' : ''}.`;
-  case 'faint': return `${name} desmaiou!`;
+  case 'faint':
+    if (health.has(subject)) health.set(subject, {...health.get(subject), hp: 0});
+    return `${name} desmaiou!`;
   case '-boost': return `${STAT_NAMES[value] || value} de ${name} aumentou${Number(extra) > 1 ? ' muito' : ''}.`;
   case '-unboost': return `${STAT_NAMES[value] || value} de ${name} diminuiu${Number(extra) > 1 ? ' muito' : ''}.`;
   case '-start': return `${name}: ${value === 'confusion' ? 'ficou confuso' : value === 'move: Leech Seed' ? 'foi atingido por Leech Seed' : value}.`;
@@ -221,11 +260,12 @@ export function createBattle({seed, playerName = 'Guerra', boss = 'red'} = {}) {
     formatid: 'gen3customgame',
     seed: [0, 1, 2, 3].map(index => hash(`${VERSION}:battle:${index}:${seedText}`) & 65535),
     p1: {name: safePlayerName, team: Teams.pack(generateTeam(seedText))},
-    p2: {name: opponentName, team: Teams.pack(RED.map(setFromEntry))},
+    p2: {name: opponentName, team: Teams.pack(generateOpponentTeam())},
   });
   const originalTeams = {p1: [...battle.p1.pokemon], p2: [...battle.p2.pokemon]};
   const random = randomGenerator(`${VERSION}:ai:${seedText}`);
   const logs = [];
+  const health = new Map();
   let logCursor = 0;
 
   function collectLogs() {
@@ -237,7 +277,7 @@ export function createBattle({seed, playerName = 'Guerra', boss = 'red'} = {}) {
         line = battle.log[logCursor++];
         logCursor++;
       }
-      const message = eventToText(line, {player: safePlayerName, opponent: opponentName});
+      const message = eventToText(line, {player: safePlayerName, opponent: opponentName}, health);
       if (message) logs.push(message);
     }
   }

@@ -66,9 +66,9 @@ function renderBattle(){
   renderTeam(view.player.team);if(view.phase==='finished')finishGame();
 }
 async function doAction(action){
-  if(!game||busy||view.phase==='finished')return;const currentGame=game;busy=true;const oldPlayer=view.player.team[view.player.activeIndex],oldOpponent=view.opponent.team[view.opponent.activeIndex];renderBattle();
+  if(!game||busy||view.phase==='finished')return;const currentGame=game;busy=true;const previousPlayerTeam=view.player.team,previousOpponentTeam=view.opponent.team;renderBattle();
   try{const next=currentGame.act(action);$('player-sprite').classList.add(action.type==='move'?'sprite-attack':'sprite-entry');await new Promise(resolve=>setTimeout(resolve,250));if(game!==currentGame)return;view=next;
-    if(view.opponent.team[view.opponent.activeIndex].hp<oldOpponent.hp)$('opponent-sprite').classList.add('sprite-hit');if(view.player.team[view.player.activeIndex].hp<oldPlayer.hp)$('player-sprite').classList.add('sprite-hit');
+    if(view.opponent.team[view.opponent.activeIndex].hp<previousOpponentTeam[view.opponent.activeIndex].hp)$('opponent-sprite').classList.add('sprite-hit');if(view.player.team[view.player.activeIndex].hp<previousPlayerTeam[view.player.activeIndex].hp)$('player-sprite').classList.add('sprite-hit');
   }catch(error){notify(error.message||'Essa ação não está disponível.');console.error(error);}finally{if(game===currentGame){busy=false;renderBattle();setTimeout(()=>{if(game===currentGame){$('player-sprite').classList.remove('sprite-attack','sprite-entry','sprite-hit');$('opponent-sprite').classList.remove('sprite-hit');}},650);}}
 }
 function finishGame(){
